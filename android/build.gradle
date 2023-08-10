@@ -1,0 +1,49 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        // kotlin_version = '1.6.10'
+
+        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
+        ndkVersion = "23.1.7779620"
+        googlePlayServicesAuthVersion="19.2.0" // android
+    }
+    repositories {
+        google()
+        mavenCentral() 
+    }
+    dependencies {
+
+        classpath("com.android.tools.build:gradle:7.3.1")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        // classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // implementation("com.android.support:appcompat-v7:27.0.0")
+
+        // implementation("com.naver.maps:map-sdk:3.16.2") 
+        // {
+        //     exclude(group = "com.android.support")
+        // }
+        classpath 'com.google.gms:google-services:4.3.10' // <--- use this version or newer
+        
+    }
+}
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url 'https://naver.jfrog.io/artifactory/maven/'        }
+        maven {
+            url 'https://devrepo.kakao.com/nexus/content/groups/public/'
+        }
+         maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../node_modules/react-native/android"
+        }
+    }
+}
+apply plugin: 'com.google.gms.google-services'
