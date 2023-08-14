@@ -297,62 +297,6 @@
 
 
 
-// // // websocket
-// // const io = SocketIO(server, {
-// //   path: "/socket.io",
-// // });
-// // app.set("io", io);
-
-// // io.on("connection", (socket) => {
-// //   let id;
-// //   let orderId;
-// //   console.log(socket.id, "연결되었습니다.");
-// //   socket.on("login", () => {
-// //     if (id) {
-// //       clearInterval(id);
-// //     }
-// //     console.log(socket.id, "로그인했습니다.");
-// //     id = setInterval(() => {
-// //       io.emit("hello", "emit");
-// //     }, 1000);
-// //   });
-// //   socket.on("ignoreOrder", () => {
-// //     if (orderId) {
-// //       clearInterval(orderId);
-// //     }
-// //   });
-// //   socket.on("acceptOrder", () => {
-// //     if (orderId) {
-// //       clearInterval(orderId);
-// //     }
-// //     orderId = setInterval(() => {
-// //       const order = {
-// //         orderId: shortid(),
-// //         start: {
-// //           latitude: Math.floor(Math.random() * 200) * 0.001 + 37.4,
-// //           longitude: Math.floor(Math.random() * 300) * 0.001 + 126.8,
-// //         },
-// //         end: {
-// //           latitude: Math.floor(Math.random() * 200) * 0.001 + 37.4,
-// //           longitude: Math.floor(Math.random() * 300) * 0.001 + 126.8,
-// //         },
-// //         price: Math.floor(Math.random() * 6) * 1000 + 6000,
-// //         rider: Math.random() > 0.5 ? shortid() : undefined,
-// //       };
-// //       orders.push(order);
-// //       io.emit("order", order);
-// //     }, 10_000);
-// //   });
-// //   socket.on("disconnect", () => {
-// //     console.log(socket.id, "연결 끊었습니다..");
-// //     if (id) {
-// //       clearInterval(id);
-// //     }
-// //     if (orderId) {
-// //       clearInterval(orderId);
-// //     }
-// //   });
-// // });
 
 
 
@@ -366,25 +310,55 @@ const shortid = require("shortid");
 const multer = require("multer");
 const cors = require("cors");
 const axios = require("axios");
-// const connect = require('./rest_api/server'); // 몽고디비 연결
+// 몽고
+// const { MongoClient } = require('mongodb');
+const mongoose = require("mongoose");
+require('dotenv').config({path:'.env'});
 const app = express();
-// connect();
+
+
 app.use(cors());
 app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// 몽고
-// const { MongoClient } = require('mongodb'); // Import the MongoDB driver
-
-
-// const mongoUrl = 'mongodb://localhost:27017';
-// const dbName = 'wgwg';
-// const client = new MongoClient(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
-
 
 const jwtSecret = "JWT_SECRET";
 const users = {};
+
+//몽구스//
+
+  const connect = async () => {
+    // if (process.env.NODE_ENV !== 'production') {
+    //   mongoose.set('debug', true);
+    // }
+    try {
+      await mongoose.connect(process.env.MONGODB_URL, {
+        // dbName: 'wgwg',
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        // useCreateIndex: true,
+      });
+      console.log('몽고디비 연결 성공');
+    } catch (error) {
+      console.error('몽고디비 연결 에러', error);
+    }
+  };
+  connect();
+// const client = new MongoClient('mongodb://localhost:27017', { 
+//   useNewUrlParser: true, 
+//   useUnifiedTopology: true 
+// });
+
+// //mongo
+// client.connect(async err => {
+//   if (err) {
+//     console.error('Error connecting to MongoDB:', err);
+//     return;
+//   }
+//   const db = client.db('wgwg');
+
+
 
 
 
@@ -455,19 +429,22 @@ app.post("/api/refreshToken", verifyRefreshToken, (req, res, next) => {
       name: users[res.locals.email].name,
     },
   });
+
+  // 아이디 삭제 (회원탈퇴)
+app.delete("/users/:userIdx", verifyToken, (req, res, next) => {
+  const userIdx = req.params.userIdx;
+
+  if (!users[userIdx]) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  delete users[userIdx];
+
+  return res.sendStatus(204); // 204 means "No Content" (success without any response body)
+});
 });
 
 
-
-
-//mongo
-client.connect(async err => {
-  if (err) {
-    console.error('Error connecting to MongoDB:', err);
-    return;
-  }
-  const db = client.db(dbName);
-//
 // POST /users/signup
 app.post("/users/signup", async(req, res, next) => {
   
@@ -503,10 +480,8 @@ app.post("/users/signup", async(req, res, next) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
-// app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
+
 // });
-});
 
 // POST /users/login
 app.post("/users/login", (req, res, next) => {
@@ -583,25 +558,14 @@ app.get('/users/userId/:userId', (req, res, next) => {
   });
 });
 
-// 아이디 삭제 (회원탈퇴)
-app.delete("/users/:userIdx", verifyToken, (req, res, next) => {
-  const userIdx = req.params.userIdx;
 
-  if (!users[userIdx]) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  delete users[userIdx];
-
-  return res.sendStatus(204); // 204 means "No Content" (success without any response body)
-});
 
 
 
 
 // 구글 로그인
-app.get('/auth/login/google', async (req, res) => {
-  const idToken = req.query.idtoken;
+app.post('/auth/google-signin', async (req, res) => {
+  const { idToken } = req.body;
   try {
     const ticket = await client.verifyIdToken({
       idToken,
@@ -654,6 +618,13 @@ app.get('/auth/login/google', async (req, res) => {
     console.error('Error verifying Google token:', error);
     res.status(500).json({ error: 'Error verifying Google token' });
   }
+
+
+  
+  const server = app.listen(3105, () => {
+    console.log("Connected.");
+  });
+
 });
 
 
@@ -662,7 +633,5 @@ app.get('/auth/login/google', async (req, res) => {
 
 
 
-const server = app.listen(3105, () => {
-  console.log("Connected.");
-});
+
 

@@ -285,7 +285,7 @@ const GoogleLogin = useCallback(async (): Promise<void> => {
         }
       );
       console.log( '서버서버',response.data, response.data.data, response);
-      const { name, email, accessToken, refreshToken } = response.data.data;
+      const { name, email, accessToken, refreshToken } = response.data;
       // const { userId, nickName } = response.data;
       dispatch(
         userSlice.actions.setUser({
