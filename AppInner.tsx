@@ -85,25 +85,30 @@ function AppInner() {
     useEffect(() => {
       const getTokenAndRefresh = async () => {
         try {
-          const token = await EncryptedStorage.getItem('refreshToken');
-          if (!token) {
+          const refreshtoken = await EncryptedStorage.getItem('refreshToken');
+          if (!refreshtoken) {
             SplashScreen.hide();
             return;
           }
           const response = await axios.post(
-            `${Config.API_URL}/api/refreshToken`,
+            `${Config.API_URL}/users/api/refreshToken`,
             {},
             {
               headers: {
-                authorization: `Bearer ${token}`,
+                authorization: `Bearer ${refreshtoken}`,
               },
             },
           );
+          console.log(response.data, response.data.data);
+          const { email, name, accessToken} = response.data.data;
           dispatch(
             userSlice.actions.setUser({
-              name: response.data.data.name,
-              email: response.data.data.email,
-              accessToken: response.data.data.accessToken,
+              // name: response.data.data.name,
+              // email: response.data.data.email,
+              // accessToken: response.data.data.accessToken,
+              name,
+              email,
+              accessToken,
             }),
           );
         } catch (error) {

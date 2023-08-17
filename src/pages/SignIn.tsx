@@ -275,29 +275,39 @@ const GoogleLogin = useCallback(async (): Promise<void> => {
     // const {name, email} =userInfo.user;
     console.log(userInfo.user.name, );
     // const response = await axios.get(`${Config.API_URL}/auth/callback/google?idtoken=${idToken}`);
+    try {
       const response = await axios.post(
-        `${Config.API_URL}/auth/google-signin`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-      console.log( '서버서버',response.data, response.data.data, response);
-      const { name, email, accessToken, refreshToken } = response.data;
-      // const { userId, nickName } = response.data;
-      dispatch(
-        userSlice.actions.setUser({
-          name,
-          email,
-          accessToken,
-        }),
-      );
-      await EncryptedStorage.setItem(
-        'refreshToken',
-        refreshToken,
-      );
+          `${Config.API_URL}/auth/google-signin`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
+  
+        console.log('회원가입 성공',response.data);
+        console.log('회원가입 성공2',response.data.data);
+        const { user, name, email, picture, AccessToken, RefreshToken } = response.data.data;
+        console.log('db데이터',user.nickName, user.userId, picture);
+          
+        dispatch(
+          userSlice.actions.setUser({
+            name: name,
+            email: email,
+            accessToken: AccessToken,
+            profilepicture: picture,
+            // RefreshToken: RefreshToken,
+          }),
+        );
+        await EncryptedStorage.setItem(
+          'refreshToken',
+          RefreshToken,
+        );
+
+    } catch(error) {
+      console.log(error);
+    } 
   } catch (error) {
     console.error('Error:', error);
   } finally {

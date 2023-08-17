@@ -16,7 +16,8 @@ function More( ) {
   const accessToken = useSelector((state: RootState) => state.user.accessToken);
   const name = useSelector((state: RootState) => state.user.name);
   const email = useSelector((state: RootState) => state.user.email);
-  const userIdx = email;
+  const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
+
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   // name revise modal
@@ -28,7 +29,8 @@ function More( ) {
     uri: '', // 프로필 기본값은 빈 문자열로 설정
     name: '',
     type: '',
-  });  const [preview, setPreview] = useState<{uri: string}>();
+  });  
+  const [preview, setPreview] = useState<{uri: string}>();
 
   const onResponse = useCallback(async (response: any) => {
     console.log(response.width, response.height, response.exif);
@@ -60,6 +62,13 @@ function More( ) {
   const handlePress = () => {
     setShowModal(true);
     setNewName(name);
+    if (!profilepicture) {
+      setImage({
+        uri: '', // Set your default profile picture URI here
+        name: '',
+        type: '',
+      });
+    }
   };
 
   // 확인 버튼 누른 후
@@ -147,7 +156,7 @@ const deleteId = useCallback(async () => {
               return;
             }
 
-            await axios.delete(`${Config.API_URL}/users/${userIdx}`, {
+            await axios.delete(`${Config.API_URL}/users/delete`, {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
               },
@@ -163,8 +172,8 @@ const deleteId = useCallback(async () => {
             Alert.alert('Success', 'User deleted successfully.');
             navigation.goBack();
           } catch (error) {
-            // const errorResponse = error.response;
-            // console.error(errorResponse);
+            const errorResponse = error;
+            console.error(errorResponse);
 
             Alert.alert('Error', 'Failed to delete user.');
           }
@@ -177,7 +186,7 @@ const deleteId = useCallback(async () => {
     ],
     { cancelable: false }
   );
-}, [accessToken, dispatch, navigation, userIdx]);
+}, [accessToken, dispatch, navigation]);
 
   return (
     <View style={styles.container}>
@@ -190,9 +199,13 @@ const deleteId = useCallback(async () => {
             <Icon style={styles.icon} name="notifications-outline"  />
           </Pressable>
           <Pressable>
-              <Image
+              {/* <Image
                 source={require('../../assets/images/more/profile-gray.png')}  
                 style={{width: 30, height: 25, marginLeft: 8}}
+              /> */}
+              <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={{width: 30, height: 30, marginLeft: 8, borderRadius: 50, }}
               />
           </Pressable>
         </View>
@@ -201,13 +214,21 @@ const deleteId = useCallback(async () => {
       <View style={styles.profileContainer}>
         <View style={styles.profilePicture}>
           <Pressable onPress={handlePress}>
-            <Image
+            {/* <Image
               style={styles.circle}
               resizeMode='cover'
               source={
                 findImage.uri ? { uri: findImage.uri } : require('../../assets/images/more/profile-gray.png')
               }            
+              /> */}
+              <Image
+                style={styles.circle}
+                resizeMode='cover'
+                source={
+                  findImage.uri ? { uri: findImage.uri } : (profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png'))
+                }            
               />
+
           </Pressable>
         </View>
 
@@ -299,8 +320,9 @@ const deleteId = useCallback(async () => {
                 style={styles.bigcircle}
                 resizeMode='cover'
                 source={
-                  findImage.uri ? { uri: findImage.uri } : require('../../assets/images/more/profile-gray.png')
-                }            
+                  findImage.uri ? { uri: findImage.uri } : { uri: profilepicture }
+                }   
+                // source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}         
                 />
             <View style={styles.profileText}>
                 <Pressable onPress={handleDefaultImage}>

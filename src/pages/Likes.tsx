@@ -163,10 +163,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import ContentsLike from '../components/ContentsLike';
 import PlaceLike from '../components/PlaceLike';
 import GoodsLike from '../components/GoodsLike';
-
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/reducer';
 
 
 function Likes({navigation}:any) {
+  const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
   const [selectedMenu, setSelectedMenu] = useState(0);
 
   const onClick = useCallback(() => {
@@ -186,10 +188,14 @@ function Likes({navigation}:any) {
             <Icon style={styles.icon} name="notifications-outline" />
           </Pressable>
           <Pressable onPress={onClick}>
-            <Image
+            {/* <Image
               source={require('../../assets/images/more/profile-gray.png')}
               style={{ width: 30, height: 25, marginLeft: 8 }}
-            />
+            /> */}
+              <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={{width: 30, height: 30, marginLeft: 8, borderRadius: 50, }}
+              />
           </Pressable>
         </View>
       </View>

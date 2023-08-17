@@ -310,55 +310,50 @@ const shortid = require("shortid");
 const multer = require("multer");
 const cors = require("cors");
 const axios = require("axios");
-// 몽고
-// const { MongoClient } = require('mongodb');
-const mongoose = require("mongoose");
-require('dotenv').config({path:'.env'});
-const app = express();
+// 몽고 스키마,라우트
+const connect = require('./schemas');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const commentsRouter = require('./routes/comments');
 
+require('dotenv').config({path:'.env'});
+
+const app = express();
+// app.set('port', process.env.PORT || 3002);
+app.set('port', 27017);
+
+
+connect();
 
 app.use(cors());
-app.use("/", express.static(path.join(__dirname, "uploads")));
+// app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/comments', commentsRouter);
+
+app.use((req, res, next) => {
+  const error = new Error(`${req.method} ${req.url}라우터가 없습니다.`);
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  res.locals.message = err.message;
+  res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+app.listen(app.get('port'), () => {
+  console.log(app.get('port'), '번 포트에서 대기 중');
+});
+
 const jwtSecret = "JWT_SECRET";
 const users = {};
-
-//몽구스//
-
-  const connect = async () => {
-    // if (process.env.NODE_ENV !== 'production') {
-    //   mongoose.set('debug', true);
-    // }
-    try {
-      await mongoose.connect(process.env.MONGODB_URL, {
-        // dbName: 'wgwg',
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        // useCreateIndex: true,
-      });
-      console.log('몽고디비 연결 성공');
-    } catch (error) {
-      console.error('몽고디비 연결 에러', error);
-    }
-  };
-  connect();
-// const client = new MongoClient('mongodb://localhost:27017', { 
-//   useNewUrlParser: true, 
-//   useUnifiedTopology: true 
-// });
-
-// //mongo
-// client.connect(async err => {
-//   if (err) {
-//     console.error('Error connecting to MongoDB:', err);
-//     return;
-//   }
-//   const db = client.db('wgwg');
-
-
 
 
 
@@ -430,58 +425,73 @@ app.post("/api/refreshToken", verifyRefreshToken, (req, res, next) => {
     },
   });
 
-  // 아이디 삭제 (회원탈퇴)
-app.delete("/users/:userIdx", verifyToken, (req, res, next) => {
-  const userIdx = req.params.userIdx;
-
-  if (!users[userIdx]) {
-    return res.status(404).json({ message: "User not found" });
+// 회원 탈퇴 처리
+app.delete('/users/delete', (req, res) => {
+  const { authorization } = req.headers;
+  
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  delete users[userIdx];
+  const accessToken = authorization.split(' ')[1];
+  
+  try {
+    // Access Token 해독
+    const decodedToken = jwt.verify(accessToken, 'your-secret-key');
 
-  return res.sendStatus(204); // 204 means "No Content" (success without any response body)
+    // 유저 찾기
+    const userIndex = users.findIndex(user => user.email === decodedToken.email);
+
+    if (userIndex === -1) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // 유저 삭제
+    users.splice(userIndex, 1);
+
+    return res.status(204).send(); // 성공적인 탈퇴
+  } catch (error) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 });
+
 });
 
 
 // POST /users/signup
-app.post("/users/signup", async(req, res, next) => {
-  
-  const { userId, nickName, password } = req.body;
-  try {
-    const existingUser = await db.collection('users').findOne({ $or: [{ email: userId }, { name: nickName }] });
-    if (existingUser) {
-    // Check if user or nickname already exists
-    // if (users[userId] || Object.values(users).some((user) => user.name === nickName)) {
-      return res.status(409).json({ message: "User or Nickname already exists" });
-    }
-    
-    // Create a new user
-    const newUser = {
-      email: userId.toLowerCase(),
-      password: password,
-      name: nickName,
-    };
-    
-    // Add the new user to the users object (simulated database)
-    // users[userId] = newUser;
-    await db.collection('users').insertOne(newUser);
-    
-    return res.json({
-      data: {
-        email: newUser.email,
-        name: newUser.name,
-        password: newUser.password,
-      },
-    });
-  } catch (error) {
-    console.error('Error during signup:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
-});
+// app.post("/users/signup", async(req, res, next) => {
 
+//   const { userId, nickName, password } = req.body;
+//   try {
+//     const existingUser = await User.findOne({ userId });
+//     if (existingUser) {
+//     // Check if user or nickname already exists
+//       return res.status(409).json({ message: "User or Nickname already exists" });
+//     }
+    
+//     const newUser = new User({
+//       // _id: new ObjectId(), // Generate a new unique ObjectId
+//       userId,
+//       nickName,
+//       password,
+//     });
+    
+//     await newUser.save();
+    
+//     return res.json({
+//       data: {
+//         userId: newUser.userId,
+//         nickName: newUser.nickName,
+//         password: newUser.password,
+//       },
+//     });
+//   } catch (error) {
+//     console.error('Error during signup:', error);
+//     return res.status(500).json({ message: 'Internal server error' });
+//   }
 // });
+
+
 
 // POST /users/login
 app.post("/users/login", (req, res, next) => {
@@ -576,8 +586,6 @@ app.post('/auth/google-signin', async (req, res) => {
     const userId = payload.email;
     const nickName = payload.name;
 
-    // 여기에서 userId(email), nickName(name)을 활용하여 사용자 로그인 처리를 하세요.
-    // 데이터베이스를 이용하여 사용자 정보를 확인하고 생성합니다.
 
     // 예시: 데이터베이스에 userId(email)가 있는지 확인
     const existingUser = await YourDatabaseModel.findOne({ email: userId });
@@ -595,7 +603,7 @@ app.post('/auth/google-signin', async (req, res) => {
       });
     } else {
       // 새로운 사용자 등록 및 로그인 처리
-      const newUser = new YourDatabaseModel({
+      const newUser = new User({
         email: userId,
         name: nickName,
         // password 등의 필요한 정보 추가

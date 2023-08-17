@@ -10,11 +10,9 @@
   "repository": {
     "type": "git`"
   },
-  "author": "ZeroCho",
+  "author": "OliviaCho",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/zerocho/food-delivery-app/issues"
-  },
+
   "homepage": "https://github.com/zerocho/food-delivery-app#readme",
   "dependencies": {
     "@nestjs/swagger": "^7.1.1",

@@ -6,9 +6,12 @@ import GoodsContents from '../components/GoodsContents';
 import WegoPick from '../components/WegoPick';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/reducer';
 
 function Home() {
+  const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
+
   const navigation = useNavigation();
   const [selectedMenu, setSelectedMenu] = useState(0);
 
@@ -37,10 +40,14 @@ function Home() {
                 <Icon style={styles.icon} name="notifications-outline"  />
             </Pressable>
             <Pressable onPress={onClick}>
-                <Image 
+                {/* <Image 
                     source={require('../../assets/images/more/profile-gray.png')}  
                     style={{width: 30, height: 25, marginLeft: 8}}
-                />
+                /> */}
+                <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={{width: 30, height: 30, marginLeft: 8, borderRadius: 50, }}
+              />
             </Pressable>
         </View>
       </View>

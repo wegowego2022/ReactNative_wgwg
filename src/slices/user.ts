@@ -16,7 +16,7 @@ const userSlice = createSlice({
       state.name = action.payload.name;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      state.profilepicture = action.payload.profilepicture;
+      state.profilepicture = action.payload.profilepicture || state.profilepicture; // 기본 이미지를 사용하거나 구글 이미지를 저장
     },
   },
   extraReducers: builder => {},

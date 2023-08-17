@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, Pressable, Image, ScrollView, InteractionManage
 import Icon from 'react-native-vector-icons/Ionicons';
 import CommunityEntire from '../components/CommunityEntire';
 import CommunityWriteBtn from '../components/CommunityWriteBtn';
-
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/reducer';
 function Community({ navigation, category }: { navigation: any; category?: string }) {
+  const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
+
   const [selectedMenu, setSelectedMenu] = useState(2);
 
     const onClick = useCallback(() => {
@@ -25,9 +28,13 @@ function Community({ navigation, category }: { navigation: any; category?: strin
             <Icon style={styles.icon} name="notifications-outline"  />
           </Pressable>
           <Pressable onPress={onClick}>
-              <Image 
+              {/* <Image 
                 source={require('../../assets/images/more/profile-gray.png')}  
                 style={{width: 30, height: 25, marginLeft: 8}}
+              /> */}
+              <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={{width: 30, height: 30, marginLeft: 8, borderRadius: 50, }}
               />
           </Pressable>
         </View>

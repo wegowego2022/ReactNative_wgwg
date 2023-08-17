@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
-
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/reducer';
 export interface CommentItemProps {
   id: number;
   message: string;
@@ -10,16 +11,23 @@ export interface CommentItemProps {
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
+
   id,
   message,
   nickname,
   publishedAt,
   onDelete,
 }) => {
+  const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
+
   return (
     <View key={id} style={styles.container}>
       <View style={styles.header}>
-        <Image style={styles.image} source={require('../../assets/images/more/profile-gray.png')} />
+        {/* <Image style={styles.image} source={require('../../assets/images/more/profile-gray.png')} /> */}
+        <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={styles.image}
+              />
         <View style={styles.info}>
           <Text style={styles.nickname}>{nickname}</Text>
           <Text style={styles.date}>{publishedAt}</Text>

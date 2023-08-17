@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, View, Text, StyleSheet } from 'react-native';
+import { Alert, View, Text, StyleSheet, Pressable } from 'react-native';
 import NaverMapView, { Marker, Path } from 'react-native-nmap';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import Config from 'react-native-config';
 import TMap from '../modules/TMap';
+
 
 interface Coordinate {
   latitude: number;
@@ -18,11 +19,14 @@ interface Address {
 
 function NaverMapPage({ navigation, route }: { navigation: any; route: { params?: { address?: string } } }) {
   const address  = route.params?.address;
-  console.log(address);
-  console.dir(navigation);
+  console.log('_______________________');
+  console.log('도착주소:', address);
+
 
   const [myPosition, setMyPosition] = useState<Coordinate | null>(null);
   const [destination, setDestination] = useState<Coordinate | null>(null);
+  console.log('내위치', myPosition);
+
 
   // 현재 위치 가져오기
   useEffect(() => {
@@ -32,6 +36,7 @@ function NaverMapPage({ navigation, route }: { navigation: any; route: { params?
           latitude: info.coords.latitude,
           longitude: info.coords.longitude,
         });
+        console.log('내위치',myPosition);
       },
       console.error,
       {
@@ -58,7 +63,7 @@ const geocodeAddress = async (address: string): Promise<Coordinate | null> => {
 
     if (items.length > 0) {
       const { x, y } = items[0];
-      console.log(x, y);
+      console.log('도착경도위도:',x, y);
       return {
         latitude: Number(y), // x와 y의 순서를 변경합니다.
         longitude: Number(x),
@@ -90,7 +95,18 @@ useEffect(() => {
 
   searchDestination();
 }, [address]);
-
+//
+const navigateWithTMap = async (title: string, longitude: string, latitude: string) => {
+  try {
+    const data = await TMap.openNavi(title, longitude, latitude, 'MOTORCYCLE');
+    console.log('TMap callback', data);
+    if (!data) {
+      Alert.alert('알림', '티맵을 설치하세요.');
+    }
+  } catch (error) {
+    console.log('TMap error:', error);
+  }
+};
 
   if (!myPosition || !myPosition.latitude) {
     return (
@@ -101,7 +117,7 @@ useEffect(() => {
   }
 
   return (
-    <View style={styles.container}>
+    <View>
       <NaverMapView
         style={{ width: '100%', height: '100%' }}
         zoomControl={true}
@@ -119,24 +135,14 @@ useEffect(() => {
               latitude: myPosition.latitude,
               longitude: myPosition.longitude,
             }}
-            width={15}
-            height={15}
-            anchor={{ x: 0.5, y: 0.5 }}
-            caption={{ text: '나' }}
-            image={require('../../assets/images/Home/star.png')}
-            onClick={() => {
-              TMap.openNavi(
-                '출발지',
-                myPosition.longitude.toString(),
-                myPosition.latitude.toString(),
-                'MOTORCYCLE',
-              ).then(data => {
-                console.log('TMap callback', data);
-                if (!data) {
-                  Alert.alert('알림', '티맵을 설치하세요1.');
-                }
-              });
-            }}
+            caption={{ text: '내위치' }}
+            // onClick={() => {
+            //   navigateWithTMap(
+            //     '출발지',
+            //     myPosition.longitude.toString(),
+            //     myPosition.latitude.toString()
+            //   );
+            // }}
           />
         )}
         {destination && destination.latitude && destination.longitude && (
@@ -145,27 +151,18 @@ useEffect(() => {
               latitude: destination.latitude,
               longitude: destination.longitude,
             }}
-            width={15}
-            height={15}
-            anchor={{ x: 0.5, y: 0.5 }}
-            caption={{ text: '도착' }}
-            image={require('../../assets/images/Home/star.png')}
+            caption={{ text: '도착지' }}
             onClick={() => {
-              TMap.openNavi(
+              navigateWithTMap(
                 '도착지',
                 destination?.longitude.toString(),
-                destination?.latitude.toString(),
-                'MOTORCYCLE',
-              ).then(data => {
-                console.log('TMap callback', data);
-                if (!data) {
-                  Alert.alert('알림', '티맵을 설치하세요2.');
-                }
-              });
+                destination?.latitude.toString()
+              );
             }}
           />
         )}
-
+        
+  
         {myPosition?.latitude && destination?.latitude && (
           <Path
             coordinates={[
@@ -179,10 +176,24 @@ useEffect(() => {
               },
             ]}
             color="#ff4376"
+            
           />
         )}
-       <Text style={styles.buttonText}>경로 더보기</Text>
       </NaverMapView>
+      {destination && destination.latitude && destination.longitude && (
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            navigateWithTMap(
+              '도착지',
+              destination?.longitude.toString(),
+              destination?.latitude.toString()
+            );
+          }}
+        >
+          <Text style={styles.buttonText}>TMap으로 가기</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -196,13 +207,13 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     backgroundColor: '#ff4376',
-    paddingVertical: 12,
-    borderRadius: 5,
+    paddingVertical: 18,
+    borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#ff4376',
-    fontSize: 16,
+    color: 'white',
+    fontSize: 19,
     fontWeight: 'bold',
   },
 });
