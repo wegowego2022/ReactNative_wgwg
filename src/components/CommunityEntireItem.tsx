@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-nati
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionic from 'react-native-vector-icons/Ionicons';
 import { ImageSourcePropType } from 'react-native';
-
 interface Item {
   id: number;
   title: string;
@@ -75,6 +74,8 @@ function CommunityEntireItem( {item} : {item: Item}) {
                         {item.comment}
                     </Text>
                 </View>
+            </View>
+            <View>
             </View>
         </View>
     );

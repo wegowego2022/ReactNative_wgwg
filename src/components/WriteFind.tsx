@@ -32,7 +32,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
     // 사진 업로드
-    const [findImage, setImage] = useState<{uri: string; name: string; type: string}>();
+    // const [findImage, setImage] = useState<{uri: string; name: string; type: string}>();
     const [preview, setPreview] = useState<{uri: string}>();
     const navigation = useNavigation();
     // const navigation = useNavigation<RouteProp<LoggedInParamList>>();
@@ -111,50 +111,63 @@ const onComplete = useCallback(async () => {
   if (!findText) {
     return Alert.alert('알림', '찾고 계신 장소에 대해 상세히 입력해주세요.');
   }
+  console.log('이미지파일',preview);
+  const findData = {
+    findName,
+    findSeries,
+    findEpisode,
+    findHour,
+    findMinute,
+    findSecond,
+    findText,
+    // findImage: findImage?.uri,
+    preview: preview?.uri,
+  };
+  dispatch(findSlice.actions.setFind(findData));
+  navigation.navigate('UploadScreen', findData);
+  // const formData = new FormData();
+  // formData.append('image', {
+  //   uri: findImage?.uri,
+  //   name: findImage?.name,
+  //   type: findImage?.type,
+  // });
+  // formData.append('findName', findName);
+  // formData.append('findSeries', findSeries);
+  // formData.append('findEpisode', findEpisode);
+  // formData.append('findHour', findHour);
+  // formData.append('findMinute', findMinute);
+  // formData.append('findSecond', findSecond);
+  // formData.append('findText', findText);
 
-  const formData = new FormData();
-  formData.append('image', {
-    uri: findImage?.uri,
-    name: findImage?.name,
-    type: findImage?.type,
-  });
-  formData.append('findName', findName);
-  formData.append('findSeries', findSeries);
-  formData.append('findEpisode', findEpisode);
-  formData.append('findHour', findHour);
-  formData.append('findMinute', findMinute);
-  formData.append('findSecond', findSecond);
-  formData.append('findText', findText);
-
-  try {
-    const response = await axios.post(`${Config.API_URL}/complete`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log(response.data);
+  // try {
+  //   const response = await axios.post(`${Config.API_URL}/complete`, formData, {
+  //     headers: {
+  //       'Content-Type': 'multipart/form-data',
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   });
+  //   console.log(response.data);
     
-    dispatch(
-      findSlice.actions.setFind({
-        findName: response.data.data.findName,
-        findSeries: response.data.data.findSeries,
-        findEpisode: response.data.data.findEpisode,
-        findHour: response.data.data.findHour,
-        findMinute: response.data.data.findMinute,
-        findSecond: response.data.data.findSecond,
-        findText: response.data.data.findText,
-      }),
-      );
+  //   dispatch(
+  //     findSlice.actions.setFind({
+  //       findName: response.data.data.findName,
+  //       findSeries: response.data.data.findSeries,
+  //       findEpisode: response.data.data.findEpisode,
+  //       findHour: response.data.data.findHour,
+  //       findMinute: response.data.data.findMinute,
+  //       findSecond: response.data.data.findSecond,
+  //       findText: response.data.data.findText,
+  //     }),
+  //     );
       
-      Alert.alert('알림', '완료되었습니다.');
-      navigation.navigate('UploadScreen',{ findName, findSeries, findEpisode, findHour, findMinute, findSecond, findText, findImage: findImage?.uri, preview });
-  } catch (error) {
-    const errorResponse = (error as AxiosError).response as AxiosResponse | undefined;
-    if (errorResponse) {
-      Alert.alert('알림', errorResponse.data.message);
-    }
-  }
+  //     Alert.alert('알림', '완료되었습니다.');
+  //     navigation.navigate('UploadScreen',{ findName, findSeries, findEpisode, findHour, findMinute, findSecond, findText, findImage: findImage?.uri, preview });
+  // } catch (error) {
+  //   const errorResponse = (error as AxiosError).response as AxiosResponse | undefined;
+  //   if (errorResponse) {
+  //     Alert.alert('알림', errorResponse.data.message);
+  //   }
+  // }
 }, [
   findName,
   findSeries,
@@ -163,7 +176,7 @@ const onComplete = useCallback(async () => {
   findMinute,
   findSecond,
   findText,
-  findImage,
+  // findImage,
   accessToken,
   dispatch,
   navigation,

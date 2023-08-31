@@ -188,6 +188,11 @@ const deleteId = useCallback(async () => {
   );
 }, [accessToken, dispatch, navigation]);
 
+// 이용약관
+
+const Privacy = useCallback(() => {
+  navigation.navigate('Privacy');
+}, [navigation]);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -275,7 +280,7 @@ const deleteId = useCallback(async () => {
             <Text style={styles.listText}>  공지/이벤트</Text>
           </View>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={Privacy}>
           <View style={styles.list}>
             <Image source={require('../../assets/images/more/terms.png')} />
             <Text style={styles.listText}>  이용약관/개인정보취급방침</Text>

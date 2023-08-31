@@ -459,37 +459,37 @@ app.delete('/users/delete', (req, res) => {
 
 
 // POST /users/signup
-// app.post("/users/signup", async(req, res, next) => {
+app.post("/users/signup", async(req, res, next) => {
 
-//   const { userId, nickName, password } = req.body;
-//   try {
-//     const existingUser = await User.findOne({ userId });
-//     if (existingUser) {
-//     // Check if user or nickname already exists
-//       return res.status(409).json({ message: "User or Nickname already exists" });
-//     }
+  const { userId, nickName, password } = req.body;
+  try {
+    const existingUser = await User.findOne({ userId });
+    if (existingUser) {
+    // Check if user or nickname already exists
+      return res.status(409).json({ message: "User or Nickname already exists" });
+    }
     
-//     const newUser = new User({
-//       // _id: new ObjectId(), // Generate a new unique ObjectId
-//       userId,
-//       nickName,
-//       password,
-//     });
+    const newUser = new User({
+      // _id: new ObjectId(), // Generate a new unique ObjectId
+      userId,
+      nickName,
+      password,
+    });
     
-//     await newUser.save();
+    await newUser.save();
     
-//     return res.json({
-//       data: {
-//         userId: newUser.userId,
-//         nickName: newUser.nickName,
-//         password: newUser.password,
-//       },
-//     });
-//   } catch (error) {
-//     console.error('Error during signup:', error);
-//     return res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
+    return res.json({
+      data: {
+        userId: newUser.userId,
+        nickName: newUser.nickName,
+        password: newUser.password,
+      },
+    });
+  } catch (error) {
+    console.error('Error during signup:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 

@@ -13,7 +13,7 @@ function Home() {
   const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
 
   const navigation = useNavigation();
-  const [selectedMenu, setSelectedMenu] = useState(0);
+  const [selectedMenu, setSelectedMenu] = useState(1);
 
   const onClick = useCallback(() => {
     navigation.navigate('More');
@@ -55,10 +55,11 @@ function Home() {
       <View>
         <View style={styles.menu}>
           <View style={styles.contents}>
-            <Pressable
+            
+            {/* <Pressable
                onPress={() => handleMenuPress(0)} style={{ borderBottomWidth: 2, borderBottomColor: selectedMenu === 0 ? 'white' : 'transparent' }}>
               <Text style={[styles.contentsText, {color: selectedMenu === 0 ? 'white' : 'dimgray'}]}>콘텐츠</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
 
 
@@ -70,10 +71,10 @@ function Home() {
           </View>
 
           <View style={styles.contents}>
-            <Pressable
+            {/* <Pressable
               onPress={() => handleMenuPress(2)} style={{ borderBottomWidth:2, borderBottomColor: selectedMenu === 2 ? 'white' : 'transparent' }}>
               <Text style={[styles.contentsText, {color: selectedMenu === 2 ? 'white' : 'dimgray'}]}>굿즈</Text>
-            </Pressable>
+            </Pressable> */}
           </View>
 
           <View style={styles.contents}>

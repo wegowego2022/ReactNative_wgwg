@@ -68,8 +68,9 @@ function SignUp({navigation}: SignUpScreenProps) {
     try { // 성공했을 때
       setLoading(true);
       console.log(Config.API_URL);
-      // http 메서드 : get, put, patch, post, delete, head, options
       const response = await axios.post(`${Config.API_URL}/users/signup`, {
+      // const response = await axios.post(`${Config.API_URL}/users`, {
+
         userId: email, // 수정
         nickName: name, // 수정
         password, // 수정

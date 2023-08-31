@@ -392,22 +392,22 @@ const GoogleLogin = useCallback(async (): Promise<void> => {
                 <Text style={styles.text}>OTT콘텐츠 속 위시 아이템을 위고위고에서 빠르게 만나보세요!</Text>
 
                 <View style={styles.button}>
-                    <Pressable onPress={()=>signInWithKakao()}>
+                    {/* <Pressable onPress={()=>signInWithKakao()}>
                         <Image style={styles.each_button} source={require('../../assets/images/login/kakao.png')} />
-                    </Pressable>
+                    </Pressable> */}
                     <Pressable onPress={()=>GoogleLogin()}>
                     <Image style={styles.each_button} source={require('../../assets/images/login/google.png')} />
                     </Pressable>
                    
 
-                    <Pressable>
+                    {/* <Pressable>
                     <Image style={styles.each_button} source={require('../../assets/images/login/apple.png')} />
-                    </Pressable>
+                    </Pressable> */}
                 </View>
                 <View style={styles.findContainer}>
                   
                   <Pressable onPress={FindPass}>
-                    <Text style={styles.findText}>비밀번호 찾기</Text>
+                    {/* <Text style={styles.findText}>비밀번호 찾기</Text> */}
                   </Pressable>
          
                 </View>

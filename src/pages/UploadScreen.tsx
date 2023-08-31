@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dimensions, View, Text, StyleSheet, Pressable, Image, TextInput, FlatList, ScrollView } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionic from 'react-native-vector-icons/Ionicons';
@@ -18,8 +18,23 @@ interface UploadScreenRouteParams {
   findSecond?: string;
   findText?: string;
   preview?:string;
-  
 }
+
+interface NewItem {
+  id: number;
+  category: string;
+  title: string;
+  text: string;
+  time: string;
+  profile: any;
+  nickname: string;
+  picture: any;
+  isLiked: boolean;
+  like: number;
+  comment: number;
+}
+
+const DATA: NewItem[] = []; 
 
 function UploadScreen({
   navigation,
@@ -50,6 +65,23 @@ function UploadScreen({
   const [comment, setComment] = useState('');
   const [isCommentInputVisible, setCommentInputVisible] = useState(false);
   const [comments, setComments] = useState<CommentItemProps[]>([]);
+// 서버시간
+  const [serverTime, setServerTime] = useState('');
+  useEffect(() => {
+    // Set the server time when the component mounts
+    const koreanDateFormatter = new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      timeZone: 'Asia/Seoul', // Set the Korean timezone
+    });
+    
+    const formattedTime = koreanDateFormatter.format(new Date());
+    setServerTime(formattedTime);
+  }, []);
 
   const handleSendComment = () => {
     if (comment.trim()) {
@@ -74,13 +106,33 @@ function UploadScreen({
     setCommentInputVisible(true);
   };
 
+  // 뒤로가기 버튼 후 
+  const handleBackButtonPress = () => {
+    const newItem: NewItem = {
+      id: DATA.length + 1,
+      category: '찾아주세요',
+      title: findName || '', // Use an empty string if undefined
+      text: findText || '', // Use an empty string if undefined
+      time: serverTime,
+      profile: profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png'),
+      nickname: name,
+      picture: preview || '', 
+      isLiked: like,
+      like: likeCount,
+      comment: comments.length,
+    };
+
+    DATA.unshift(newItem);
+
+    navigation.navigate('Community', { newItem });
+  };
+
   return (
     <ScrollView>
 
     <View style={styles.block}>
-      <Pressable>
+      <Pressable onPress={handleBackButtonPress}>
       {/* <Pressable onPress={() => navigation.goBack()}> */}
-
         <Icon style={styles.icon} name="arrow-back-outline" />
       </Pressable>
 
@@ -88,11 +140,15 @@ function UploadScreen({
 
       <View style={styles.profileContainer}>
         <View>
-          <Image style={styles.profile} source={require('../../assets/images/Home/profile-gray.png')} />
+        <Image
+                source={profilepicture ? { uri: profilepicture } : require('../../assets/images/more/profile-gray.png')}
+                style={styles.profile}
+              />
+
         </View>
         <View>
           <Text style={styles.nickname}>{name}</Text>
-          <Text style={styles.time}>서버시간</Text>
+          <Text style={styles.time}>{serverTime}</Text>
         </View>
       </View>
 
@@ -103,7 +159,7 @@ function UploadScreen({
         <Text style={styles.episodeTime}>- {findHour} {findMinute} {findSecond}</Text>
       </View>
      
-      {preview && <Image source={preview} style={styles.image} />}
+      {preview && <Image source={{ uri: preview }} style={styles.image} />}
 
 
       <View style={styles.flex}>
@@ -241,10 +297,12 @@ const styles = StyleSheet.create({
     },
    
     profile: {
-        width: 37,
-        height: 37,
+        width: 30,
+        height: 30,
         resizeMode: 'contain',
         marginRight: 14,
+        borderRadius: 50,
+        marginLeft: 8, 
     },
     nickname: {
         color: 'white',

@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
 
 const connect = async () => {
-    if (process.env.NODE_ENV !== 'production') {
-      mongoose.set('debug', true);
-    }
+    // if (process.env.NODE_ENV !== 'production') {
+    //   mongoose.set('debug', true);
+    // }
+    
     try {
+      mongoose.set('debug', true);
+
       await mongoose.connect(process.env.MONGODB_URL, {
+        // dbName: 'wgwg',
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });

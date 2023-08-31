@@ -26,6 +26,7 @@ import PlacePickInfo from './src/components/PlacePickInfo';
 import PlacePickInfo2 from './src/components/PlacePickInfo2';
 import UploadScreen from './src/pages/UploadScreen';
 import NaverMapPage from './src/pages/NaverMapPage';
+import Privacy from './src/components/Privacy';
 type Item = {
   id: number;
   title: string;
@@ -72,6 +73,7 @@ type Item = {
     PlacePickInfo: { item: Item };
     PlacePickInfo2: { item: Item };
     NaverMapPage: undefined;
+    Privacy: undefined;
   };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -223,6 +225,12 @@ function AppInner() {
                 component={NaverMapPage}
                 options={{ headerShown: false }}
               />
+
+            <Stack.Screen 
+              name="Privacy"
+              component={Privacy}
+              options={{headerShown: false}}
+            />
 
            </Stack.Navigator>
             ) : (

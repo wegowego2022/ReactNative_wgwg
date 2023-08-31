@@ -5,7 +5,7 @@ import CommunityEntire from '../components/CommunityEntire';
 import CommunityWriteBtn from '../components/CommunityWriteBtn';
 import {useSelector} from 'react-redux';
 import {RootState} from '../store/reducer';
-function Community({ navigation, category }: { navigation: any; category?: string }) {
+function Community({ navigation, route, category }: { navigation: any; route:any; category?: string }) {
   const profilepicture = useSelector((state: RootState) => state.user.profilepicture);
 
   const [selectedMenu, setSelectedMenu] = useState(2);
@@ -69,6 +69,7 @@ function Community({ navigation, category }: { navigation: any; category?: strin
             </Pressable>
           </View> */}
         </ScrollView>
+
        <CommunityWriteBtn navigation={navigation} />
         
         <ScrollView >
@@ -86,7 +87,9 @@ function Community({ navigation, category }: { navigation: any; category?: strin
           </>
         )} */}
         {selectedMenu === 2 && (
-          <CommunityEntire navigation={navigation} category='찾아주세요'/>
+          // <CommunityEntire navigation={navigation} category='찾아주세요'/>
+          <CommunityEntire navigation={navigation} route={route} category='찾아주세요' />
+
         )}
         {/* {selectedMenu === 3 && (
           <CommunityEntire navigation={navigation} category='꿀팁공유'/>

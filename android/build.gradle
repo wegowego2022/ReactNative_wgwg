@@ -6,28 +6,25 @@ buildscript {
         minSdkVersion = 21
         compileSdkVersion = 33
         targetSdkVersion = 33
-        // kotlin_version = '1.6.10'
-
-        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
-        googlePlayServicesAuthVersion="19.2.0" // android
+        kotlin_version = '1.6.10'
     }
     repositories {
         google()
         mavenCentral() 
     }
     dependencies {
-
+        classpath('com.google.gms:google-services:4.3.3')
         classpath("com.android.tools.build:gradle:7.3.1")
         classpath("com.facebook.react:react-native-gradle-plugin")
-        // classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
         // implementation("com.android.support:appcompat-v7:27.0.0")
 
         // implementation("com.naver.maps:map-sdk:3.16.2") 
         // {
         //     exclude(group = "com.android.support")
         // }
-        classpath 'com.google.gms:google-services:4.3.10' // <--- use this version or newer
+        // classpath 'com.google.gms:google-services:4.3.10' // <--- use this version or newer
         
     }
 }
@@ -46,4 +43,4 @@ allprojects {
         }
     }
 }
-apply plugin: 'com.google.gms.google-services'
+// apply plugin: 'com.google.gms.google-services'

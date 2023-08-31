@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">wgwg</string>
     <string name="kakao_app_key">733b4e8236bb983325e11c64f7ea6041</string>
+    <string name="appCenterCrashes_whenToSendCrashes" moduleConfig="true" translatable="false">DO_NOT_ASK_JAVASCRIPT</string>
+    <string name="appCenterAnalytics_whenToEnableAnalytics" moduleConfig="true" translatable="false">ALWAYS_SEND</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">60X8OkY2dst7dY18uW3iFgg51YFnbsvlfIGGp</string>
+
 </resources>

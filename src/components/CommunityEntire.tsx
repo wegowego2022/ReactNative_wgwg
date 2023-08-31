@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
 import CommunityEntireItem from './CommunityEntireItem';
 
@@ -6,6 +6,20 @@ type Item = {
     id: number;
     title: string;
     category: string;
+    text: string;
+    time: string;
+    profile: any;
+    nickname: string;
+    picture: any;
+    isLiked: boolean;
+    like: number;
+    comment: number;
+};
+
+type NewItem = {
+    id: number;
+    category: string;
+    title: string;
     text: string;
     time: string;
     profile: any;
@@ -113,16 +127,32 @@ const DATA: Item[] = [
 type CommunityEntireProps = {
     category?: string;
     navigation: any;
+    route: any;
 };
 
-function CommunityEntire({ category, navigation }: CommunityEntireProps) {
+function CommunityEntire({ category, navigation, route }: CommunityEntireProps) {
     
-    let filteredData :Item[] = DATA;
+    // let filteredData :Item[] = DATA;
 
-    if (category) {
-      filteredData = DATA.filter((item) => item.category === category);
-    }    
-    const count = filteredData.length;
+    // if (category) {
+    //   filteredData = DATA.filter((item) => item.category === category);
+    // }    
+    // const count = filteredData.length;
+// 새로 추가 된 항목
+const [filteredData, setFilteredData] = useState<Item[]>(DATA);
+
+useEffect(() => {
+  if (category) {
+    const newData = DATA.filter((item) => item.category === category);
+    setFilteredData(newData);
+  }
+}, [category]);
+
+const newItem: NewItem | undefined = route.params?.newItem;
+
+if (newItem) {
+  setFilteredData((prevData) => [newItem, ...prevData]);
+}
 
 
     const CommunityPress = (item: Item) => {

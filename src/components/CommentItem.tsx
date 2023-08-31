@@ -7,7 +7,7 @@ export interface CommentItemProps {
   message: string;
   nickname: string;
   publishedAt: string;
-  onDelete: () => void;
+  onDelete: (commentId: number) => void; // Add onDelete property here
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
@@ -32,9 +32,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <Text style={styles.nickname}>{nickname}</Text>
           <Text style={styles.date}>{publishedAt}</Text>
         </View>
-        <Pressable style={styles.deleteButton} onPress={onDelete}>
+        {/* <Pressable style={styles.deleteButton} onPress={onDelete}>
           <Text style={styles.deleteButtonText}>Delete</Text>
-        </Pressable>
+        </Pressable> */}
       </View>
       <Text style={styles.message}>{message}</Text>
     </View>
